@@ -70,7 +70,7 @@ class PaintApp:
         self.root.bind('<Control-Shift-m>', self.apply_bw_filter)
         self.root.bind('<Control-Shift-J>', lambda event: self.select_tool("crop"))
         self.root.bind('<Control-Shift-K>', lambda event: self.select_tool("доливка"))
-
+#холс по умолчанию
     def expand_canvas(self, new_width, new_height):
         self.c.config(width=new_width, height=new_height)
         new_image = Image.new("RGB", (new_width, new_height), "white")
@@ -81,7 +81,7 @@ class PaintApp:
         self.draw = ImageDraw.Draw(self.image)
 
         self.update_canvas()
-
+#для золста что бы менять размер
     def prompt_expand_canvas(self):
         new_width = simpledialog.askinteger("Новая ширина", "Введите новую ширину холста:")
         new_height = simpledialog.askinteger("Новая высота", "Введите новую высоту холста:")
@@ -104,13 +104,13 @@ class PaintApp:
             self.add_text(event)
         elif self.current_tool == 'fill':
             self.start_fill(event)
-
+#это что бы можно было рисовать по ЛКМ
     def handle_motion(self, event):
         if self.current_tool in ['кисть', 'ластик']:
             self.do_paint(event)
         elif self.current_tool in ['rectangle', 'oval', 'line']:
             self.update_draw_shape(event)
-
+#доп фигурки
     def handle_release(self, event):
         if self.current_tool in ['rectangle', 'oval', 'line', 'кисть', 'ластик']:
             self.finalize_draw_shape(event)
@@ -207,31 +207,6 @@ class PaintApp:
         elif tool == "fill_canvas":
                 self.fill_canvas_with_color(self.current_color)
 
-    ##
-    def finalize_draw_shape(self, event):
-        # Предыдущий код...
-        shape_info = {
-            'type': self.current_tool,
-            'coords': self.c.coords(self.rect),
-            'color': self.current_color
-        }
-        self.shapes.append(shape_info)
-
-    def is_inside_any_shape(self, x, y):
-        for shape in self.shapes:
-            coords = shape['coords']
-            if shape['type'] == "rectangle":
-                if coords[0] < x < coords[2] and coords[1] < y < coords[3]:
-                    return True
-            elif shape['type'] == "oval":
-                # Для овала проверка будет сложнее, нужна математика эллипса
-                pass
-        return False
-
-    def point_inside_rectangle(x, y, rect):
-        x1, y1, x2, y2 = rect
-        return x1 < x < x2 and y1 < y < y2
-
     def start_draw_shape(self, event):
         self.start_x = event.x
         self.start_y = event.y
@@ -245,7 +220,7 @@ class PaintApp:
     def update_draw_shape(self, event):
         if self.current_tool in ["rectangle", "oval", "line"]:
             self.c.coords(self.rect, self.start_x, self.start_y, event.x, event.y)
-
+#закончить рисовать фигуру
     def finalize_draw_shape(self, event):
         if self.current_tool in ["rectangle", "oval"]:
             x0, y0, x1, y1 = self.c.coords(self.rect)
@@ -259,21 +234,16 @@ class PaintApp:
         self.save_to_history()
 
     def add_text(self, event):
-        # Запрашиваем у пользователя текст для добавления
+        #запрашиваем у пользователя текст для добавления
         text = simpledialog.askstring("Текст", "Введите текст:")
-        if text:  # Проверяем, что пользователь ввёл текст
-            # Теперь запрашиваем размер шрифта
+        if text:  #проверяем
+            #теперь запрашиваем размер шрифта
             font_size = simpledialog.askinteger("Размер шрифта", "Введите размер шрифта:", minvalue=1, maxvalue=100)
             if font_size:  # Проверяем, что пользователь ввёл размер шрифта
-                # Указываем путь к шрифту, который будет использоваться
-                font_path = "C:\\Windows\\Fonts\\ARIALN.TTF"
-                # Укажите путь к вашему шрифту
+                #указываем путь к шрифту
+                font_path = "C:\\Windows\\Fonts\\ARIALN.TTF"   
                 font = ImageFont.truetype(font_path, font_size)
-
-                # Добавляем текст на изображение
                 self.draw.text((event.x, event.y), text, fill=self.current_color, font=font)
-
-                # Обновляем холст и историю
                 self.update_canvas()
                 self.save_to_history()
 
