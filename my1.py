@@ -124,9 +124,9 @@ class PaintApp:
     # fuction for zoom
     def zoom_image(self, event):
         scale_factor = 1.1
-        if event.num == 5 or event.delta == -120:  # Уменьшение масштаба
+        if event.num == 5 or event.delta == -120: 
             scale_factor = 1.0 / scale_factor
-        x, y = self.c.canvasx(event.x), self.c.canvasy(event.y)  # Получаем координаты курсора на холсте
+        x, y = self.c.canvasx(event.x), self.c.canvasy(event.y)  
         new_width = int(self.image.width * scale_factor)
         new_height = int(self.image.height * scale_factor)
         self.image = self.image.resize((new_width, new_height), Image.Resampling.LANCZOS)
@@ -165,10 +165,8 @@ class PaintApp:
 
     # panel color
     def setup_color_palette(self):
-        # Создаем фрейм для панели с цветами и располагаем его справа
         self.color_palette_frame = tk.Frame(self.root, width=60)
         self.color_palette_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
-        # Заполняем панель кнопками выбора цвета
         colors = ['black', 'gray', 'white', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
         for color in colors:
             btn = tk.Button(self.color_palette_frame, bg=color, width=2, height=1,command=lambda color=color: self.select_color(color))
@@ -234,13 +232,10 @@ class PaintApp:
         self.save_to_history()
 
     def add_text(self, event):
-        #запрашиваем у пользователя текст для добавления
         text = simpledialog.askstring("Текст", "Введите текст:")
-        if text:  #проверяем
-            #теперь запрашиваем размер шрифта
+        if text:
             font_size = simpledialog.askinteger("Размер шрифта", "Введите размер шрифта:", minvalue=1, maxvalue=100)
-            if font_size:  # Проверяем, что пользователь ввёл размер шрифта
-                #указываем путь к шрифту
+            if font_size:
                 font_path = "C:\\Windows\\Fonts\\ARIALN.TTF"   
                 font = ImageFont.truetype(font_path, font_size)
                 self.draw.text((event.x, event.y), text, fill=self.current_color, font=font)
@@ -254,7 +249,7 @@ class PaintApp:
             self.current_color = chosen_color
         self.current_color = colorchooser.askcolor(color=self.current_color)[1]
 
-    # if if elif for dolivka kist lastik
+
     def start_paint(self, event):
         if self.current_tool == 'доливка':
             self.start_fill(event)
@@ -263,7 +258,7 @@ class PaintApp:
         elif self.current_tool == 'ластик':
             self.start_erase(event)
 
-    # start zalivki kotori ya tak i tak ne ponyal kak sdelat
+
     def start_fill(self, event):
         x, y = event.x, event.y
         start_color = self.image.getpixel((x, y))
@@ -272,7 +267,7 @@ class PaintApp:
         self.save_to_history()
         self.fill_canvas_with_color(self.current_color)
 
-    # pixels for zalivka
+   
     def get_pixel_color(self, x, y):
         image_x = self.image_position[0] + x
         image_y = self.image_position[1] + y
@@ -347,10 +342,10 @@ class PaintApp:
 
     # ctrl z
     def undo(self, event=None):
-        if len(self.history) > 1:  # Проверяем, есть ли что отменять
-            self.history.pop()  # Удаляем последнее состояние из истории
-            self.image = self.history[-1].copy()  # Восстанавливаем последнее доступное состояние
-            self.update_canvas()  # Обновляем холст
+        if len(self.history) > 1: 
+            self.history.pop()  
+            self.image = self.history[-1].copy() 
+            self.update_canvas() 
         else:
             print("Нечего отменять")
 
@@ -365,12 +360,9 @@ class PaintApp:
         file_path = filedialog.askopenfilename()
         if file_path:
             self.image = Image.open(file_path).convert("RGB")
-            # Здесь мы устанавливаем размер загруженного изображения равным размеру холста
             self.image = self.image.resize((self.canvas_width, self.canvas_height), Image.Resampling.LANCZOS)
             self.draw = ImageDraw.Draw(self.image)
             self.update_canvas()
-
-            # Обновляем границы изображения в соответствии с новым размером
             self.image_bounds = (0, 0, self.canvas_width, self.canvas_height)
             self.update_canvas()
 
@@ -480,22 +472,17 @@ class PaintApp:
 
     # update холста
     def update_canvas(self):
-        self.tk_image = ImageTk.PhotoImage(self.image)  # Создаем изображение для Tkinter
+        self.tk_image = ImageTk.PhotoImage(self.image)
         if self.canvas_image is None:
-            # Если canvas_image еще не создан, создаем его
             self.canvas_image = self.c.create_image(0, 0, anchor="nw", image=self.tk_image)
         else:
-            # Если canvas_image уже существует, просто обновляем его изображение
             self.c.itemconfig(self.canvas_image, image=self.tk_image)
         self.c.pack(fill=tk.BOTH, expand=True)
 
     def fill_canvas_with_color(self, fill_color):
-        # Создаем новое изображение с нужным цветом
         new_image = Image.new("RGB", self.image.size, fill_color)
-        # Заменяем текущее изображение новым
         self.image = new_image
         self.draw = ImageDraw.Draw(self.image)
-        # Обновляем холст
         self.update_canvas()
 
     def fill_shape(self, shape_id, color):
@@ -519,7 +506,7 @@ class PaintApp:
             return
         file_extension = file_path.split('.')[-1].lower()
         if file_extension not in ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'tiff', 'tif']:
-            file_path += '.png'  # Добавляем расширение PNG по умолчанию
+            file_path += '.png'  
             file_extension = 'png'
 
         file_format = 'JPEG' if file_extension in ['jpg', 'jpeg'] else file_extension.upper()
